@@ -36,6 +36,25 @@
                 margin: 10px;
                 box-shadow: 0 1px 1px gray;
             }
+            #add-button {
+                position: fixed;
+                right: 3em;
+                bottom: 3em;
+                width: 5em;
+                height: 5em;
+                border-radius: 50%;
+                background-color: #d00;
+                color: white;
+                box-shadow: 0 1px 4px gray;
+                cursor: pointer;
+            }
+            .flex-container {
+                display: flex;
+                width: 100%;
+                height: 100%;
+                justify-content: center;
+                align-items: center;
+            }
         </style>
     </head>
     <body>
@@ -46,6 +65,24 @@
             <div id="page-header" class="row text-center">
                 <h1 id="header-title"><strong>Your pin</strong></h1>
                 <h4 id="header-subtitle">Pinterest clone exercise for freeCodeCamp</h4>
+            </div>
+            <div id="add-button">
+                <div class="flex-container">
+                    <h1><i class="fa fa-plus"></i></h1>
+                </div>
+            </div>
+            <div class="modal fade" id="add-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Add new picture...</h4>
+                        </div>
+                        <div class="modal-body">
+                            <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="row" ng-show="isLogged">
                 <p>Welcome, {{user.displayName}}!</p>
@@ -80,6 +117,11 @@
                     // options
                     itemSelector: '.grid-item',
                     columnWidth: 270
+                });
+                
+                // Open modal to add new picture upon clicking the button
+                $('#add-button').click(function() {
+                    $('#add-modal').modal('show');
                 });
             }(jQuery));
         </script>
