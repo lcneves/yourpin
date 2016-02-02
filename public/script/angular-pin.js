@@ -45,7 +45,7 @@
         var addObject = {};
         $scope.submitPicture = function(title, picture) {
             (function($) {
-                $.post("add-picture", function(data) {
+                $.post("add-picture", {title: title, picture: picture}, function(data) {
                     if (data.error) {
                         $scope.addObject.status = "error";
                         $scope.addObject.message = data.message;
