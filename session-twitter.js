@@ -20,7 +20,7 @@ module.exports.init = function(sessionKey, twitterConsumerKey, twitterConsumerSe
     SESSION_KEY = sessionKey;
     TWITTER_CONSUMER_KEY = twitterConsumerKey;
     TWITTER_CONSUMER_SECRET = twitterConsumerSecret;
-    CALLBACK_URL = isProduction ? "https://yourbar.herokuapp.com/session/twitter/callback" : "http://localhost:8080/session/twitter/callback";
+    CALLBACK_URL = isProduction ? "https://yourpin.herokuapp.com/session/twitter/callback" : "http://localhost:8080/session/twitter/callback";
     module.exports.router = router;
     
     router.use(session({
