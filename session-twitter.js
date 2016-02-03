@@ -41,7 +41,6 @@ module.exports.init = function(sessionKey, twitterConsumerKey, twitterConsumerSe
         consumerSecret: TWITTER_CONSUMER_SECRET,
         callbackURL: CALLBACK_URL
     }, function(token, tokenSecret, profile, done) {
-        console.log(util.inspect(profile));
         return done(null, profile);
     }));
 

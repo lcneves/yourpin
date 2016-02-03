@@ -12,6 +12,8 @@ var PRODUCTION = process.env.PORT ? true : false,
     sessionTwitter = require('./session-twitter.js'),
     bodyparser = require('body-parser'),
     session = require('express-session'),
+    MongoStore = require('connect-mongo')(session),
+    store,
     express = require('express'),
     app = express();
     
@@ -26,7 +28,11 @@ app.use(session({
     cookie: {
         secure: false,
     },
-    secret: SESSION_KEY
+    secret: SESSION_KEY,
+    store: new MongoStore({
+        url: DB_URL,
+        touchAfter: 24 * 3600 // time period in seconds
+    })
 }));
     
 // Route login calls to /session to my session.js.
@@ -40,14 +46,15 @@ app.use(express.static('public'));
 
 // Function to add new pictures to user's collection
 app.post('/add-picture', function (req, res) {
-    var userID = req.session.passport ? objectID(req.session.passport.user) : false;
-    if (!userID) {
+    var userID = req.session.passport.user ? req.session.passport.user.id : false;
+    var userRealName = req.session.passport.user ? req.session.passport.user.displayName : false;
+    console.log("User ID: " + userID + " , Real name: " + userRealName);
+    if (!userID || !userRealName) {
         return res.send({
             error: true,
             message: "Not logged in"
         });
     }
-    // var userRealName = TODO: add user's realname.
     var addObject = JSON.parse(JSON.stringify(req.body));
     delete addObject['$$hashKey'];
     addObject.owner = {
@@ -72,7 +79,7 @@ app.post('/add-picture', function (req, res) {
 
 // Function to undo the above
 app.post('/remove-picture', function (req, res) {
-    var userID = req.session.passport ? objectID(req.session.passport.user) : false;
+    var userID = req.session.id ? req.session.id : false;
     if (!userID) {
         return res.send({
             error: true,
@@ -83,11 +90,11 @@ app.post('/remove-picture', function (req, res) {
     if (userID != removeObject.owner.id) {
         return res.send({
             error: true,
-            message: "User does not own the book"
+            message: "User does not own the picture"
         });
     }
-    var removeID = objectID(removeObject.owner.id);
-    librariesCollection.remove({ _id: removeID }, { justOne: true }, function(err, data) {
+    var removeID = objectID(removeObject._id);
+    collection.remove({ _id: removeID }, { justOne: true }, function(err, data) {
         if (err) {
             res.send({
                 error: true,
@@ -129,7 +136,7 @@ app.post('/list-user-pictures', function (req, res) {
             message: "Invalid query"
         });
     }
-    collection.find({owner[id]: userID}).sort({time: -1}).limit(MAX_RESULTS).toArray(function(err, data) {
+    collection.find({"owner.id": userID}).sort({time: -1}).limit(MAX_RESULTS).toArray(function(err, data) {
         if (err) {
             res.send({
                 error: true,

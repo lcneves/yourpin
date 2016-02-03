@@ -1,5 +1,5 @@
 (function() {
-    var app = angular.module('pinModule', ['loginModule']);
+    var app = angular.module('pinModule', ['loginModule', 'masonry']);
     
 
     
@@ -42,23 +42,53 @@
         
         // Begin Your Pin controller logic
         
-        var addObject = {};
         $scope.submitPicture = function(title, picture) {
+            $scope.addObject.status = "loading";
             (function($) {
                 $.post("add-picture", {title: title, picture: picture}, function(data) {
+                    $scope.addObject.title = "";
+                    $scope.addObject.link = "";
                     if (data.error) {
                         $scope.addObject.status = "error";
                         $scope.addObject.message = data.message;
                     } else {
                         $scope.addObject.status = "success";
-                        $scope.addObject.books = data.data;
+                        $('#add-modal').modal('hide');
+                        reset();
                     }
                     $scope.$apply();
                 });
             }(jQuery));
         };
         
-        // Initialization
+        // Function to get all pins
+        var listAllPictures = function($) {
+            $scope.listAll.status = "loading";
+            $.post("list-all-pictures", function(data) {
+                if (data.error) {
+                    $scope.listAll.status = "error";
+                    $scope.listAll.message = data.message;
+                } else {
+                    $scope.listAll.status = "success";
+                    if (Array.isArray(data.data)) {
+                        var dataArray = [];
+                        data.data.forEach(function(element, index, array) {
+                            element.date = new Date(element.time).toDateString();
+                            dataArray.push(element);
+                        });
+                        $scope.listAll.pins = dataArray;
+                        
+                    }
+                }
+                $scope.$apply();
+            });
+        };
         
+        // Initialization
+        var reset = function() {
+            $scope.listAll = {};
+            listAllPictures(jQuery);
+        };
+        reset();
     }]);
 }());
