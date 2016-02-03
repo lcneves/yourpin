@@ -42,6 +42,7 @@
         
         // Begin Your Pin controller logic
         
+        // Function that allows an authenticated user to add a picture
         $scope.submitPicture = function(title, picture) {
             $scope.addObject.status = "loading";
             (function($) {
@@ -49,6 +50,7 @@
                     $scope.addObject.title = "";
                     $scope.addObject.link = "";
                     if (data.error) {
+                        console.log("Error: " + data.message);
                         $scope.addObject.status = "error";
                         $scope.addObject.message = data.message;
                     } else {
@@ -61,11 +63,33 @@
             }(jQuery));
         };
         
+        // Function that allows an authenticated user to remove a picture they own
+        $scope.removePicture = function(pin) {
+            if ($scope.removeObject.status != "loading") {
+                $scope.removeObject.status = "loading";
+                (function($) {
+                    $.post("remove-picture", pin, function(data) {
+                        if (data.error) {
+                            console.log("Error: " + data.message);
+                            $scope.removeObject.status = "error";
+                            $scope.removeObject.message = data.message;
+                        } else {
+                            $scope.removeObject.status = "success";
+                            $('#user-pictures-modal').modal('hide');
+                            reset();
+                        }
+                        $scope.$apply();
+                    });
+                }(jQuery));
+            }
+        };
+        
         // Function to get all pins
-        var listAllPictures = function($) {
+        var listAllPictures = function() {
             $scope.listAll.status = "loading";
-            $.post("list-all-pictures", function(data) {
+            jQuery.post("list-all-pictures", function(data) {
                 if (data.error) {
+                    console.log("Error: " + data.message);
                     $scope.listAll.status = "error";
                     $scope.listAll.message = data.message;
                 } else {
@@ -77,17 +101,45 @@
                             dataArray.push(element);
                         });
                         $scope.listAll.pins = dataArray;
-                        
                     }
                 }
                 $scope.$apply();
             });
         };
         
+        // Function to get a user's pins
+        $scope.listUserPictures = function(user) {
+            if ($scope.listUser.status != "loading") {
+                $scope.listUser.status = "loading";
+                $scope.listUser.realName = user.realName ? user.realName : user.displayName;
+                jQuery.post("list-user-pictures", {id: user.id}, function(data) {
+                    if (data.error) {
+                        console.log("Error: " + data.message);
+                        $scope.listUser.status = "error";
+                        $scope.listUser.message = data.message;
+                    } else {
+                        $scope.listUser.status = "success";
+                        if (Array.isArray(data.data)) {
+                            var dataArray = [];
+                            data.data.forEach(function(element, index, array) {
+                                element.date = new Date(element.time).toDateString();
+                                dataArray.push(element);
+                            });
+                            $scope.listUser.pins = dataArray;
+                        }
+                        (function($) { $('#user-pictures-modal').modal('show'); }(jQuery));
+                    }
+                    $scope.$apply();
+                });
+            }
+        };
+        
         // Initialization
         var reset = function() {
             $scope.listAll = {};
-            listAllPictures(jQuery);
+            $scope.listUser = {};
+            $scope.removeObject = {};
+            listAllPictures();
         };
         reset();
     }]);

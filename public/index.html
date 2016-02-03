@@ -12,49 +12,62 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <!-- Animate.css -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.2.3/animate.min.css" />
-        <!-- Google Font for page title -->
+        <!-- Pacifico Google Font for page title -->
+        <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css' />
         <style>
-            body {
+            body, #list-user-body {
                 background-color: #E9E9E9;
+            }
+            a:hover {
+                cursor: pointer;
             }
             #page-header {
                 position: relative;
                 color: #d00;
+                margin-bottom: 2em;
             }
             #header-title {
-                font-size: 3em;
+                font-family: 'Pacifico', cursive;
+                font-size: 4em;
+                text-shadow: 1px 1px 2px;
             }
-            #header-subtitle {
-                position: relative;
-                top: -0.4em;
-            }
-            .grid-item {
-                background-color: white;
-                min-height: 10em;
-                border-radius: 8px;
-                width: 250px;
-                margin: 10px;
-                box-shadow: 0 1px 1px gray;
-            }
-            #add-button {
+            #add-button, #profile-button {
+                z-index: 1;
                 position: fixed;
                 right: 3em;
-                bottom: 3em;
                 width: 4em;
                 height: 4em;
                 border-radius: 50%;
-                background-color: #d00;
                 color: white;
                 box-shadow: 1px 2px 4px gray;
                 cursor: pointer;
             }
+            #add-button {
+                bottom: 2em;
+                background-color: #d00;
+            }
+            #profile-button {
+                bottom: 7em;
+                background-color: #dd0;
+            }
             #add-icon {
+                width: 1.5em;
                 transition: transform 0.4s;
+            }
+            .profile-icon {
+                    font-size: 1.7em;
+            }
+            .grid-item {
+                background-color: white;
+                min-height: 10em;
+                border-radius:8px;
+                width: 275px;
+                margin: 10px;
+                box-shadow: 1px 2px 1px gray;
+                padding: 0;
             }
             .flex-container {
                 display: flex;
-                position: relative;
-                bottom: 0.2em;
                 width: 100%;
                 height: 100%;
                 justify-content: center;
@@ -77,12 +90,17 @@
             }
             .grid-img {
                 width: 100%;
+                border-radius: 8px 8px 0 0;
             }
             .grid-info {
                 padding: 0.5em;
             }
             .grid-desc {
                 line-height: 0.8em;
+            }
+            .delete-icon {
+                float: right;
+                font-size: 1.7em;
             }
         </style>
     </head>
@@ -92,15 +110,21 @@
                 <div ng-include="'login-strip.html'"></div>
             </div>
             <div id="page-header" class="row text-center">
-                <h1 id="header-title"><strong>Your pin</strong></h1>
+                <h1 id="header-title"><strong>Your Pin</strong></h1>
                 <h4 id="header-subtitle">Pinterest clone exercise for freeCodeCamp</h4>
             </div>
             <div class="row" ng-show="isLogged">
                 <div id="add-button">
                     <div class="flex-container">
-                        <h2><i id="add-icon" class="fa fa-plus"></i></h2>
+                        <svg id="add-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 19"><rect x="0" y="8" width="19" height="3" style="fill:white;"/><rect x="8" y="0" width="3" height="19" style="fill:white;"/></svg>
                     </div>
-                    <span class="label label-default tooltip-label">Add picture</span>
+                    <span id="add-label" class="label label-default tooltip-label">Add picture</span>
+                </div>
+                <div id="profile-button" ng-click="listUserPictures(user)">
+                    <div class="flex-container">
+                        <i class="fa fa-user profile-icon" ng-show="listUser.status != 'loading'"></i><i class="fa fa-cog fa-spin profile-icon" ng-show="listUser.status == 'loading'"></i>
+                    </div>
+                    <span id="profile-label" class="label label-default tooltip-label">My pictures</span>
                 </div>
                 <div class="modal fade" id="add-modal" tabindex="-1" role="dialog">
                     <div class="modal-dialog" role="document">
@@ -134,13 +158,37 @@
                     </div>
                 </div>
             </div>
+            <div class="modal fade" id="user-pictures-modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">{{listUser.realName}}'s pictures</h4>
+                        </div>
+                        <div id="list-user-body" class="modal-body">
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-8 col-xs-offset-2 grid-item" ng-repeat="pin in listUser.pins">
+                                    <img class="grid-img" ng-src="{{pin.picture}}" err-src="img/image-placeholder.png">
+                                    <div class="grid-info">
+                                        <h4 class="grid-title">{{pin.title}}</h4>
+                                        <a ng-click="removePicture(pin)"><i class="delete-icon text-danger fa fa-trash" ng-show="isLogged && pin.owner.id == user.id && removeObject.status != 'loading'"></i></a><i class="fa fa-cog fa-spin delete-icon" ng-show="removeObject.status == 'loading'"></i>
+                                        <small class="grid-desc"><p>by {{pin.owner.realName}}</p>
+                                        <p>on {{pin.date}}</p></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row">
-                <div masonry='{ "transitionDuration" : "0.4s" , "itemSelector" : ".grid-item"}'>
-                    <div class="grid-item" masonry-tile ng-repeat="pin in listAll.pins">
+                <div masonry='{ "transitionDuration" : "0.4s" , "itemSelector" : ".all-grid-item"}'>
+                    <div class="all-grid-item grid-item" masonry-tile ng-repeat="pin in listAll.pins">
                         <img class="grid-img" ng-src="{{pin.picture}}" err-src="img/image-placeholder.png">
                         <div class="grid-info">
                             <h4 class="grid-title">{{pin.title}}</h4>
-                            <small class="grid-desc"><p>by {{pin.owner.realName}}</p>
+                            <a ng-click="removePicture(pin)"><i class="delete-icon text-danger fa fa-trash" ng-show="isLogged && pin.owner.id == user.id && removeObject.status != 'loading'"></i></a><i class="fa fa-cog fa-spin delete-icon" ng-show="removeObject.status == 'loading'"></i>
+                            <small class="grid-desc"><p>by <a ng-click="listUserPictures(pin.owner)">{{pin.owner.realName}}</a></p>
                             <p>on {{pin.date}}</p></small>
                         </div>
                     </div>
@@ -170,13 +218,21 @@
                     $('#add-modal').modal('show');
                 });
                 $('#add-button').hover(function() {
-                    $('.tooltip-label').css( {'display': 'block', 'opacity': '1' });
+                    $('#add-label').css( {'display': 'block', 'opacity': '1' });
                     $('#add-icon').css('transform', 'rotate(90deg)');
                 }, function() {
-                    $('.tooltip-label').css('opacity', '0');
+                    $('#add-label').css('opacity', '0');
                     $('#add-icon').css('transform', 'rotate(0deg)');
                     window.setTimeout(function() {
-                        $('.tooltip-label').hide();
+                        $('#add-label').hide();
+                    }, 400);
+                });
+                $('#profile-button').hover(function() {
+                    $('#profile-label').css( {'display': 'block', 'opacity': '1' });
+                }, function() {
+                    $('#profile-label').css('opacity', '0');
+                    window.setTimeout(function() {
+                        $('#profile-label').hide();
                     }, 400);
                 });
             }(jQuery));

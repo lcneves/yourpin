@@ -48,7 +48,6 @@ app.use(express.static('public'));
 app.post('/add-picture', function (req, res) {
     var userID = req.session.passport.user ? req.session.passport.user.id : false;
     var userRealName = req.session.passport.user ? req.session.passport.user.displayName : false;
-    console.log("User ID: " + userID + " , Real name: " + userRealName);
     if (!userID || !userRealName) {
         return res.send({
             error: true,
@@ -79,7 +78,7 @@ app.post('/add-picture', function (req, res) {
 
 // Function to undo the above
 app.post('/remove-picture', function (req, res) {
-    var userID = req.session.id ? req.session.id : false;
+    var userID = req.session.passport.user ? req.session.passport.user.id : false;
     if (!userID) {
         return res.send({
             error: true,
@@ -87,7 +86,7 @@ app.post('/remove-picture', function (req, res) {
         });
     }
     var removeObject = JSON.parse(JSON.stringify(req.body));
-    if (userID != removeObject.owner.id) {
+    if (userID != removeObject['owner[id]']) {
         return res.send({
             error: true,
             message: "User does not own the picture"
@@ -129,14 +128,14 @@ app.post('/list-all-pictures', function (req, res) {
 
 // Retrieves all pictures owned by a user
 app.post('/list-user-pictures', function (req, res) {
-    var userID = req.body.userID ? objectID(req.body.userID) : false;
+    var userID = req.body.id ? req.body.id : false;
     if (!userID) {
         return res.send({
             error: true,
             message: "Invalid query"
         });
     }
-    collection.find({"owner.id": userID}).sort({time: -1}).limit(MAX_RESULTS).toArray(function(err, data) {
+    collection.find({"owner.id": userID}).sort({time: -1}).toArray(function(err, data) {
         if (err) {
             res.send({
                 error: true,
