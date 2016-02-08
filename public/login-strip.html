@@ -18,6 +18,17 @@
     }
     .navbar-right {
         padding: 0 15px;
+        float: right !important;
+        margin-right: -15px;
+    }
+    .navbar-brand {
+        display: none;
+    }
+    
+    @media screen and (min-width: 768px) {
+        .navbar-brand {
+            display: block;
+        }
     }
 </style>
 <div id="login-body" ng-app="loginModule">
