@@ -57,6 +57,9 @@
             .profile-icon {
                     font-size: 1.7em;
             }
+            #masonry-div {
+              margin: 0 auto;
+            }
             .grid-item {
                 background-color: white;
                 min-height: 10em;
@@ -101,6 +104,16 @@
             .delete-icon {
                 float: right;
                 font-size: 1.7em;
+            }
+            @media (max-height: 768px) {
+                #preview-img {
+                    max-width: 50%;
+                }
+            }
+            @media (max-height: 768px) and (orientation: landscape) {
+              #preview-img {
+                  max-width: 20%;
+              }
             }
         </style>
     </head>
@@ -182,7 +195,7 @@
                 </div>
             </div>
             <div class="row">
-                <div masonry='{ "transitionDuration" : "0.4s" , "itemSelector" : ".all-grid-item"}'>
+                <div id="masonry-div" masonry='{ "transitionDuration" : "0.4s" , "itemSelector" : ".all-grid-item" , "fitWidth" : "true" }'>
                     <div class="all-grid-item grid-item" masonry-tile ng-repeat="pin in listAll.pins">
                         <img class="grid-img" ng-src="{{pin.picture}}" err-src="img/image-placeholder.png">
                         <div class="grid-info">
