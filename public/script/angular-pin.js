@@ -1,8 +1,28 @@
 (function() {
     var app = angular.module('pinModule', ['loginModule', 'masonry']);
-    
 
-    
+    app.directive('ngGate8Masonry', function($timeout) {
+        return function(scope, element, attrs) {
+
+            if (scope.$last){
+                $timeout(function () {
+                    var parent = element.parent();
+                    var masonry = new Masonry(parent[0], {
+                        itemSelector: '.all-grid-item',
+                        isAnimated: true,
+                        animationOptions: {
+                            duration: 750,
+                            easing: 'linear',
+                            queue: false
+                        },
+                        transitionDuration : "0.4s",
+                        isResizable: false
+                    });
+                });
+            }
+        };
+    });
+
     // Function to replace broken links with a placeholder, including in the preview.
     // Got it from here: http://stackoverflow.com/questions/16310298/if-a-ngsrc-path-resolves-to-a-404-is-there-a-way-to-fallback-to-a-default\
     app.directive('errSrc', function() {
@@ -21,9 +41,9 @@
             }
         }
     });
-    
+
     app.controller('MainController', ['$scope', 'loginStatus', function($scope, loginStatus) {
-        
+
         // Listen to angular-login.js' $emit info on login
         $scope.receivedLogin = false;
         $scope.$on('received', function(event, data) {
@@ -39,9 +59,9 @@
                 $scope.user = '';
             }
         });
-        
+
         // Begin Your Pin controller logic
-        
+
         // Function that allows an authenticated user to add a picture
         $scope.submitPicture = function(title, picture) {
             $scope.addObject.status = "loading";
@@ -62,7 +82,7 @@
                 });
             }(jQuery));
         };
-        
+
         // Function that allows an authenticated user to remove a picture they own
         $scope.removePicture = function(pin) {
             if ($scope.removeObject.status != "loading") {
@@ -83,7 +103,7 @@
                 }(jQuery));
             }
         };
-        
+
         // Function to get all pins
         var listAllPictures = function() {
             $scope.listAll.status = "loading";
@@ -106,7 +126,7 @@
                 $scope.$apply();
             });
         };
-        
+
         // Function to get a user's pins
         $scope.listUserPictures = function(user) {
             if ($scope.listUser.status != "loading") {
@@ -133,7 +153,7 @@
                 });
             }
         };
-        
+
         // Initialization
         var reset = function() {
             $scope.listAll = {};
