@@ -264,9 +264,10 @@
                     }, 400);
                 });
 
-                jQuery("img").load(function() {
-                  jQuery("#masonry-div").masonry(); //this tweak is a fix on chrome and safari browser
-});
+                // Fix for Safari, souuce: http://code-tricks.com/jquery-masonry-plugin-breaks-on-chrome-and-safari/
+                $("img").load(function() {
+                    $("#masonry-div").masonry();
+                });
             }(jQuery));
         </script>
     </body>
