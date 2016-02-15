@@ -48,7 +48,7 @@
                     <h4 class="navbar-text">Welcome, {{user.displayName}}!</h4>
                 </div>
                 <div ng-show="receivedLogin && !isLogged">
-                    <h4 class="navbar-text">Not logged in. <span ng-show="!window.frameElement">Please <a id="login-link" class="navbar-link" href="session/twitter">login with Twitter</a></span><span ng-show="window.frameElement"><a href="https://yourpin.herokuapp.com" target="_blank">Open in new tab</a> to login</span>.</h4>
+                    <h4 class="navbar-text">Not logged in. <span ng-show="window.frameElement === null">Please <a id="login-link" class="navbar-link" href="session/twitter">login with Twitter</a></span><span ng-show="window.frameElement !== null"><a href="https://yourpin.herokuapp.com" target="_blank">Open in new tab</a> to login</span>.</h4>
                 </div>
                 <div ng-show="!receivedLogin">
                     <h4 class="navbar-text">Loading, please wait...</h4>
