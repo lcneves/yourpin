@@ -11,7 +11,7 @@
         };
         return service;
     });
-    
+
     app.controller('StatusController', ['$scope', 'loginStatus', function($scope, loginStatus) {
         // This controller uses $emit to send login info to the main app controller, that should be the parent scope.
         // It also uses $broadcast to send info to the children controllers, such as SettingsController.
@@ -28,16 +28,26 @@
                 } else {
                     $scope.$emit('user', false);
                     $scope.user = loginStatus.data;
-                    $scope.isLogged = false; 
+                    $scope.isLogged = false;
                 }
                 $scope.$apply();
             });
         };
         $scope.getLogin();
+
+        // Check if we're inside an iframe, because we need to get out to login with Twitter
+        $scope.isIframe = function () {
+          console.log(window.frameElement);
+          if (window.frameElement) {
+            return true;
+          } else {
+            return false;
+          }
+        };
     }]);
-    
+
     app.controller('RegisterController', ['$scope', function($scope) {
-        
+
         $scope.message = "";
         $scope.register = function() {
             if (!$scope.isLoading) {
@@ -59,7 +69,7 @@
             }
         };
     }]);
-    
+
     app.controller('LoginController', ['$scope', function($scope) {
         $scope.user = {
             username: '',
@@ -82,7 +92,7 @@
             }
         };
     }]);
-    
+
     app.controller('LogoutController', ['$scope', function($scope) {
         $scope.logout = function() {
             if (!$scope.isLoading) {
@@ -94,7 +104,7 @@
             }
         };
     }]);
-    
+
     app.controller('SettingsController', ['$scope', function($scope) {
         // Update form fields upon receiving login information
         $scope.$on('user', function(event, data){
