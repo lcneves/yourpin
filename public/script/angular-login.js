@@ -36,12 +36,12 @@
         $scope.getLogin();
 
         // Check if we're inside an iframe, because we need to get out to login with Twitter
+        // Source: http://stackoverflow.com/questions/326069/how-to-identify-if-a-webpage-is-being-loaded-inside-an-iframe-or-directly-into-t
         $scope.isIframe = function () {
-          console.log(window.frameElement);
-          if (window.frameElement) {
-            return true;
-          } else {
-            return false;
+          try {
+              return window.self !== window.top;
+          } catch (e) {
+              return true;
           }
         };
     }]);
