@@ -211,7 +211,7 @@
             </div>
             <div class="row">
                 <div id="masonry-div" masonry='{ "transitionDuration" : "0.4s" , "itemSelector" : ".all-grid-item" , "fitWidth" : "true" }'>
-                    <div class="all-grid-item grid-item" masonry-tile ng-repeat="pin in listAll.pins">
+                    <div class="all-grid-item grid-item" masonry-tile ng-repeat="pin in listAll.pins" ng-gate8-masonry>
                         <img class="grid-img" ng-src="{{pin.picture}}" err-src="img/image-placeholder.png">
                         <div class="grid-info">
                             <h4 class="grid-title">{{pin.title}}</h4>
@@ -263,6 +263,10 @@
                         $('#profile-label').hide();
                     }, 400);
                 });
+
+                jQuery("img").load(function() {
+                  jQuery("#masonry-div").masonry(); //this tweak is a fix on chrome and safari browser
+});
             }(jQuery));
         </script>
     </body>
